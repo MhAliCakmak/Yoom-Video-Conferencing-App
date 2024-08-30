@@ -162,9 +162,21 @@ const MeetingTypeList = () => {
         className="text-center"
         buttonText="Join Meeting"
         handleClick={() => {
-          const url = new URL(values.link);
-          const pathWithQuery = url.pathname + url.search;
-          router.push(pathWithQuery);
+          let link = values.link;
+
+          // Check if the link is a relative URL
+          if (!link.startsWith("http://") && !link.startsWith("https://")) {
+            // Prepend the base URL
+            link = `https://${link}`;
+          }
+
+          try {
+            const url = new URL(link);
+            const pathWithQuery = url.pathname + url.search;
+            router.push(pathWithQuery);
+          } catch (error) {
+            console.error("Invalid URL:", error);
+          }
         }}
       >
         <Input

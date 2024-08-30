@@ -29,6 +29,7 @@ const PersonalRoom = () => {
   const { user } = useUser();
   const meetingId = user?.id;
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}/personal=true`;
+
   const client = useStreamVideoClient();
   const router = useRouter();
 
@@ -53,7 +54,7 @@ const PersonalRoom = () => {
       <div className="flex w-full flex-col gap-8 xl:max-w-[900px]">
         <Table title="Topic" description={`${user?.username}'s meeting room`} />
         <Table title="Meeting ID" description={meetingId!} />
-        <Table title="Invite Link" description={meetingLink} />
+        <Table title="Invite Link" description={`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}`} />
       </div>
       <div className="flex gap-5">
         <Button className="bg-blue-1" onClick={startRoom}>
@@ -62,7 +63,7 @@ const PersonalRoom = () => {
         <Button
           className="bg-dark-3"
           onClick={() => {
-            navigator.clipboard.writeText(meetingLink);
+            navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}`);
             toast({ title: "Link copied" });
           }}
         >

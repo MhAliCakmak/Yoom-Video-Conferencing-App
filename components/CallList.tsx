@@ -14,7 +14,8 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
     useGetCalls();
   const router = useRouter();
   const [recordings, setRecordings] = useState<CallRecording[]>([]);
-  const {toast} = useToast();
+  const { toast } = useToast();
+  const [recordingLoading, setRecordingLoading] = useState(false);
 
   const getCalls = () => {
     switch (type) {
@@ -45,6 +46,7 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
   useEffect(() => {
     const fetchRecordings = async () => {
       try {
+        setRecordingLoading(true);
         const callData = await Promise.all(
           callRecordings.map((meeting) => meeting.queryRecordings())
         );
@@ -54,7 +56,9 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
 
         setRecordings(recordings);
       } catch (error) {
-        toast({title:"Try again later"})
+        toast({ title: "Try again later" });
+      } finally {
+        setRecordingLoading(false);
       }
     };
     if (type === "recordings") fetchRecordings();
@@ -64,6 +68,7 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
   const noCallsMessage = getNoCallsMessage();
 
   if (isLoading) return <Loader />;
+  if (recordingLoading) return <Loader />;
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {calls && calls.length > 0 ? (
@@ -78,9 +83,9 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
                 : "/icons/recordings.svg"
             }
             title={
-              (meeting as Call).state?.custom.description.substring(0, 26) ||
-              meeting.filename.substring(0, 20) ||
-              "No description"
+              (meeting as Call).state?.custom?.description?.substring(0, 26) ||
+              meeting?.filename?.substring(0, 20) ||
+              "Personal Meeting"
             }
             date={
               (meeting as Call).state?.startsAt?.toLocaleString() ||
@@ -106,7 +111,7 @@ const CallList = ({ type }: { type: "ended" | "upcoming" | "recordings" }) => {
           />
         ))
       ) : (
-        <h1>{noCallsMessage}</h1>
+        <h1> {noCallsMessage}</h1>
       )}
     </div>
   );
